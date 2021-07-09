@@ -1,6 +1,6 @@
 # Nats demo
 
-This project contains a few examples for using NATs.
+This project contains a few examples for using NATS.
 
 Enter an example directory and follow the instructions in the README.
 
