@@ -20,12 +20,18 @@ func main() {
 	}
 	defer nc.Close()
 
+	js, err := nc.JetStream()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create jetstream ctx")
+		return
+	}
+
 	log.Info().Msg("Connected")
 
 	for i := 1; i <= 10; i++ {
 		log.Info().Msg("Sending msg...")
 		data := fmt.Sprintf("id [%d]", i)
-		if err := nc.Publish("ticket.new",
+		if _, err := js.Publish("ticket.new",
 			[]byte(data)); err != nil {
 			log.Error().Err(err).Msg("Couldn't publish")
 		}

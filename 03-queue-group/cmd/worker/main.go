@@ -31,9 +31,9 @@ func main() {
 
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	go worker(nc, "worker-1", "ticket.batch")
-	go worker(nc, "worker-2", "ticket.batch")
-	go worker(nc, "worker-3", "ticket.batch")
+	go worker(nc, "worker-1", "ticket.new")
+	go worker(nc, "worker-2", "ticket.new")
+	go worker(nc, "worker-3", "ticket.new")
 
 	log.Info().Msg("Launched 3 workers")
 
@@ -46,13 +46,13 @@ func main() {
 	nc.Drain()
 }
 
-func worker(nc *nats.Conn, name, topic string) {
+func worker(nc *nats.Conn, name, subject string) {
 	logger := log.With().Str("worker", name).Logger()
 
 	ch := make(chan *nats.Msg)
-	sub, err := nc.ChanQueueSubscribe(topic, "batch-workers", ch)
+	sub, err := nc.ChanQueueSubscribe(subject, "ticket-workers", ch)
 	if err != nil {
-		logger.Error().Err(err).Msg("Cannot subscribe to topic")
+		logger.Error().Err(err).Msg("Cannot subscribe to subject")
 		return
 	}
 
@@ -65,8 +65,7 @@ func worker(nc *nats.Conn, name, topic string) {
 			wg.Done()
 			return
 		case msg := <-ch:
-			log.Info().Str("worker", name).Str("data",
-				string(msg.Data)).Msg("got msg")
+			logger.Info().Str("data", string(msg.Data)).Msg("Got msg")
 		}
 	}
 }

@@ -46,6 +46,7 @@ func service(nc *nats.Conn) {
 				continue
 			}
 			log.Info().Str("data", string(msg.Data)).Msg("Got msg")
+			// we can also use msg.Respond([]byte("hey you"))
 			nc.Publish(msg.Reply, []byte("hey you"))
 		}
 	}

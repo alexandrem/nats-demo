@@ -3,7 +3,7 @@
 In terminal 1:
 
 ```console
-nats-server-v2.3.2
+nats-server
 ```
 
 In terminal 2:
