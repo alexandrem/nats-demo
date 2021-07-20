@@ -1,4 +1,4 @@
-module github.com/alexandrem/nats-demo/03-queue-group
+module github.com/alexandrem/nats-demo/04-stream-queue-group
 
 go 1.16
 
