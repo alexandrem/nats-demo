@@ -62,5 +62,5 @@ func consumer(nc *nats.Conn, name, subject string) {
 
 	<-quit
 	wg.Done()
-	logger.Info().Msgf("Shutting down")
+	logger.Info().Msgf("Terminated")
 }
