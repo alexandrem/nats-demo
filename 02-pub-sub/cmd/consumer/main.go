@@ -5,7 +5,6 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 
 	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog"
@@ -47,32 +46,21 @@ func main() {
 	nc.Drain()
 }
 
-func consumer(nc *nats.Conn, name, topic string) {
+func consumer(nc *nats.Conn, name, subject string) {
 	logger := log.With().Str("consumer", name).Logger()
 
-	sub, err := nc.Subscribe(topic, func(msg *nats.Msg) {
-		logger.Info().Str("topic", topic).Str("data",
+	_, err := nc.Subscribe(subject, func(msg *nats.Msg) {
+		logger.Info().Str("subject", msg.Subject).Str("data",
 			string(msg.Data)).Msg("Got msg")
 	})
 	if err != nil {
-		logger.Error().Err(err).Msg("Cannot subscribe to topic")
+		logger.Error().Err(err).Msg("Cannot subscribe to subject")
 		return
 	}
 
 	wg.Add(1)
 
-	for {
-		select {
-		case <-quit:
-			wg.Done()
-			return
-		default:
-			msg, err := sub.NextMsg(10 * time.Millisecond)
-			if err != nil {
-				continue
-			}
-			log.Info().Msgf("got msg: %v", string(msg.Data))
-			nc.Publish(msg.Reply, []byte("hey you"))
-		}
-	}
+	<-quit
+	wg.Done()
+	logger.Info().Msgf("Shutting down")
 }
